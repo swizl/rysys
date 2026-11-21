@@ -1,0 +1,105 @@
+=== autogen ===
+=== configure ===
+configure: loading site script /usr/local/etc/config.site
+checking build system type... x86_64-pc-msys
+checking host system type... x86_64-pc-msys
+checking target system type... x86_64-pc-msys
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether ln works... yes
+checking whether ln -s works... no, using cp -pR
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for gawk... gawk
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.exe
+checking for suffix of executables... .exe
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking for g++... g++
+checking whether we are using the GNU C++ compiler... yes
+checking whether g++ accepts -g... yes
+checking whether g++ accepts -static-libstdc++ -static-libgcc... yes
+checking for gnatbind... no
+checking for gnatmake... no
+checking whether compiler driver understands Ada... no
+checking how to compare bootstrapped objects... cmp --ignore-initial=16 $$f1 $$f2
+checking for objdir... .libs
+checking for isl 0.16, 0.15, or deprecated 0.14... no
+recommended isl version is 0.16 or 0.15, the minimum required isl version 0.14 is deprecated
+checking for isl 0.16 or 0.15... no
+checking for default BUILD_CONFIG... 
+checking for --enable-vtable-verify... no
+checking for bison... no
+checking for byacc... no
+checking for yacc... no
+checking for bison... no
+checking for gm4... no
+checking for gnum4... no
+checking for m4... m4
+checking for flex... no
+checking for lex... no
+checking for flex... no
+checking for makeinfo... no
+/d/src/rysys/src/msys2-runtime/missing: line 81: makeinfo: command not found
+checking for expect... expect
+checking for runtest... runtest
+checking for ar... ar
+checking for as... as
+checking for dlltool... dlltool
+checking for ld... (cached) /usr/lib/gcc/x86_64-pc-cygwin/16.2.0/../../../../x86_64-pc-cygwin/bin/ld.exe
+checking for lipo... no
+checking for nm... nm
+checking for ranlib... ranlib
+checking for strip... strip
+checking for windres... windres
+checking for windmc... windmc
+checking for objcopy... objcopy
+checking for objdump... objdump
+checking for readelf... readelf
+checking for -plugin option... no
+checking for cc... cc
+checking for c++... c++
+checking for gcc... gcc
+checking for gcj... no
+checking for gfortran... no
+checking for gccgo... no
+checking for ar... ar
+checking for as... as
+checking for dlltool... dlltool
+checking for ld... ld
+checking for lipo... no
+checking for nm... nm
+checking for objcopy... objcopy
+checking for objdump... objdump
+checking for ranlib... ranlib
+checking for readelf... readelf
+checking for strip... strip
+checking for windres... windres
+checking for windmc... windmc
+checking where to find the target ar... host tool
+checking where to find the target as... host tool
+checking where to find the target cc... host tool
+checking where to find the target c++... host tool
+checking where to find the target c++ for libstdc++... host tool
+checking where to find the target dlltool... host tool
+checking where to find the target gcc... host tool
+checking where to find the target gcj... host tool
+checking where to find the target gfortran... host tool
+checking where to find the target gccgo... host tool
+checking where to find the target ld... host tool
+checking where to find the target lipo... host tool
+checking where to find the target nm... host tool
+checking where to find the target objcopy... host tool
+checking where to find the target objdump... host tool
+checking where to find the target ranlib... host tool
+checking where to find the target readelf... host tool
+checking where to find the target strip... host tool
+checking where to find the target windres... host tool
+checking where to find the target windmc... host tool
+checking whether to enable maintainer-specific portions of Makefiles... no
+configure: creating ./config.status
+config.status: creating Makefile
+=== CONFIGURE_OK ===

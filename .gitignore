@@ -1,0 +1,13 @@
+build/
+.git_upstream/
+*.o
+*.obj
+*.a
+*.lib
+*.exe
+*.dll
+*.pdb
+config.log
+config.status
+config.cache
+src/msys2-runtime/x86_64-pc-cygwin/
