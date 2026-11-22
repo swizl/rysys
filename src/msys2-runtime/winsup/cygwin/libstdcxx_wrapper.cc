@@ -25,22 +25,24 @@ details.  */
 #define MANGLED_ZNWX_NOTHROW_T		"__wrap__ZnwmRKSt9nothrow_t"
 #define MANGLED_ZNAX_NOTHROW_T		"__wrap__ZnamRKSt9nothrow_t"
 
-extern void *operator new(std::size_t sz) noexcept (false)
-			__asm__ (MANGLED_ZNWX);
-extern void *operator new[](std::size_t sz) noexcept (false)
-			__asm__ (MANGLED_ZNAX);
-extern void operator delete(void *p) noexcept (true)
-			__asm__ (_SYMSTR (__wrap__ZdlPv));
-extern void operator delete[](void *p) noexcept (true)
-			__asm__ (_SYMSTR (__wrap__ZdaPv));
-extern void *operator new(std::size_t sz, const std::nothrow_t &nt) noexcept (true)
-			__asm__ (MANGLED_ZNWX_NOTHROW_T);
-extern void *operator new[](std::size_t sz, const std::nothrow_t &nt) noexcept (true)
-			__asm__ (MANGLED_ZNAX_NOTHROW_T);
-extern void operator delete(void *p, const std::nothrow_t &nt) noexcept (true)
-			__asm__ (_SYMSTR (__wrap__ZdlPvRKSt9nothrow_t));
-extern void operator delete[](void *p, const std::nothrow_t &nt) noexcept (true)
-			__asm__ (_SYMSTR (__wrap__ZdaPvRKSt9nothrow_t));
+/* clang compatibility: asm labels are rejected after <new> declared
+   the operators, so alias the wrapper names to the ABI definitions. */
+asm (".globl __wrap__Znwm\n\t.set __wrap__Znwm, _Znwm\n"
+     ".globl __wrap__Znam\n\t.set __wrap__Znam, _Znam\n"
+     ".globl __wrap__ZdlPv\n\t.set __wrap__ZdlPv, _ZdlPv\n"
+     ".globl __wrap__ZdaPv\n\t.set __wrap__ZdaPv, _ZdaPv\n"
+     ".globl __wrap__ZnwmRKSt9nothrow_t\n\t.set __wrap__ZnwmRKSt9nothrow_t, _ZnwmRKSt9nothrow_t\n"
+     ".globl __wrap__ZnamRKSt9nothrow_t\n\t.set __wrap__ZnamRKSt9nothrow_t, _ZnamRKSt9nothrow_t\n"
+     ".globl __wrap__ZdlPvRKSt9nothrow_t\n\t.set __wrap__ZdlPvRKSt9nothrow_t, _ZdlPvRKSt9nothrow_t\n"
+     ".globl __wrap__ZdaPvRKSt9nothrow_t\n\t.set __wrap__ZdaPvRKSt9nothrow_t, _ZdaPvRKSt9nothrow_t\n");
+extern void *operator new(std::size_t sz) noexcept (false);
+extern void *operator new[](std::size_t sz) noexcept (false);
+extern void operator delete(void *p) noexcept (true);
+extern void operator delete[](void *p) noexcept (true);
+extern void *operator new(std::size_t sz, const std::nothrow_t &nt) noexcept (true);
+extern void *operator new[](std::size_t sz, const std::nothrow_t &nt) noexcept (true);
+extern void operator delete(void *p, const std::nothrow_t &nt) noexcept (true);
+extern void operator delete[](void *p, const std::nothrow_t &nt) noexcept (true);
 
 extern void *
 operator new(std::size_t sz) noexcept (false)

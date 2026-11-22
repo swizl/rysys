@@ -347,7 +347,7 @@ public:
       "  .seh_handlerdata						\n" \
       "  .long 1							\n" \
       "  .rva %l[__l_try],%l[__l_endtry],%l[__l_except],%l[__l_except]	\n" \
-      "  .seh_code							\n" \
+      "  .text							\n" \
       : : : : __l_try, __l_endtry, __l_except); \
     { \
       __l_try: \

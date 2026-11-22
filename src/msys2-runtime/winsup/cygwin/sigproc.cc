@@ -544,7 +544,7 @@ sigproc_init ()
   /* sync_proc_subproc is used by proc_subproc.  It serializes
      access to the children and proc arrays.  */
   sync_proc_subproc.init ("sync_proc_subproc");
-  new cygthread (wait_sig, cygself, "sig");
+  new cygthread ((LPVOID_THREAD_START_ROUTINE) wait_sig, cygself, "sig");
 }
 
 /* Exit the current thread very carefully.
