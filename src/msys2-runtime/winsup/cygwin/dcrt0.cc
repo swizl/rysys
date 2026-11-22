@@ -587,6 +587,10 @@ child_info_fork::handle_fork ()
   cygheap_fixup_in_child (false);
   memory_init ();
   myself.thisproc (NULL);
+  /* The fork child never runs pinfo_init, so mirror its preserve () here.
+     Otherwise ~pinfo () at exit () releases myself's shared pinfo view and
+     do_exit () dereferences NULL when writing myself->stopsig. */
+  myself.preserve ();
   myself->uid = cygheap->user.real_uid;
   myself->gid = cygheap->user.real_gid;
 
@@ -745,6 +749,9 @@ dll_crt0_0 ()
   set_cygwin_privileges (hProcToken);
 
   device::init ();
+  /* Ctors may allocate: atexit -> pthread_mutex::init -> calloc -> mmap ->
+     cmalloc, so the cygheap allocator has to be ready beforehand. */
+  cygheap_init ();
   do_global_ctors (&__CTOR_LIST__, 1);
   cygthread::init ();
 

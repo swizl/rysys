@@ -1686,6 +1686,21 @@ fhandler_dev_zero::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
 	 due to a non-writable target address.  The protection is
 	 set to the correct one anyway in the fixup loop. */
       base = VirtualAlloc (address, size, alloc_type, PAGE_READWRITE);
+      if (!base)
+	{
+	  /* A forked child may already have an anonymous mapping at this
+	     very address: its global ctors run before handle_fork and may
+	     have allocated through mmap.  That stale mapping is no longer
+	     part of the map list (the list is overwritten when the parent's
+	     data is copied over), so release it and try again. */
+	  MEMORY_BASIC_INFORMATION m;
+	  if (VirtualQuery (address, &m, sizeof (m))
+	      && m.State != MEM_FREE
+	      && m.AllocationBase == address
+	      && m.RegionSize >= size
+	      && VirtualFree (address, 0, MEM_RELEASE))
+	    base = VirtualAlloc (address, size, alloc_type, PAGE_READWRITE);
+	}
     }
   else
     base = MapView (h, address, size, get_access (), prot, flags, offset, true);

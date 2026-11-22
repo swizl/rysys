@@ -196,6 +196,14 @@ user_heap_info::sbrk (ptrdiff_t n)
   char *newtop, *newbrk;
   SIZE_T commitbytes, newbrksize, reservebytes;
 
+  /* Before memory_init() runs (global ctors may allocate), there is no heap.
+     Return CMFAIL so dlmalloc falls back to mmap instead of treating a NULL
+     brk value as a valid allocation. */
+  if (!base)
+    {
+      set_errno (ENOMEM);
+      return (void *) -1;
+    }
   if (n == 0)
     return ptr;					/* Just wanted to find current ptr
 						   address */
