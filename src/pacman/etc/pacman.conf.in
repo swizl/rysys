@@ -15,7 +15,7 @@
 #LogFile     = @localstatedir@/log/日月.log
 #GPGDir      = @sysconfdir@/日月.d/gnupg/
 #HookDir     = @sysconfdir@/日月.d/hooks/
-HoldPkg     = rypm glibc
+HoldPkg     = 包管理 glibc
 #XferCommand = /usr/bin/curl -L -C - -f -o %o %u
 #XferCommand = /usr/bin/wget --passive-ftp -c -O %o %u
 #CleanMethod = KeepInstalled

@@ -34,7 +34,7 @@ source "$MAKEPKG_LIBRARY"/util/message.sh
 source "$MAKEPKG_LIBRARY"/util/parseopts.sh
 
 usage() {
-	printf "rypm-db-upgrade (pacman) %s\n" "${myver}"
+	printf "数据库升级 (日月) %s\n" "${myver}"
 	echo
 	printf -- "$(gettext "Upgrade the local pacman database to a newer format")\n"
 	echo
@@ -51,7 +51,7 @@ usage() {
 }
 
 version() {
-	printf "rypm-db-upgrade (pacman) %s\n" "$myver"
+	printf "数据库升级 (日月) %s\n" "$myver"
 	printf -- "Copyright (c) 2010-2024 Pacman Development Team <pacman-dev@lists.archlinux.org>.\n"
 	printf '\n'
 	printf -- "$(gettext "\
@@ -107,9 +107,9 @@ while true; do
 	shift
 done
 
-conffile=${conffile:-@sysconfdir@/pacman.conf}
-[[ -z $pacroot ]] && pacroot=$(rypm-conf --config="$conffile" rootdir)
-[[ -z $dbroot ]] && dbroot=$(rypm-conf --config="$conffile" --rootdir="$pacroot" dbpath)
+conffile=${conffile:-@sysconfdir@/日月.conf}
+[[ -z $pacroot ]] && pacroot=$(包管理配置 --config="$conffile" rootdir)
+[[ -z $dbroot ]] && dbroot=$(包管理配置 --config="$conffile" --rootdir="$pacroot" dbpath)
 
 # check if messages are to be printed using color
 if [[ -t 2 && $USE_COLOR != "n" ]]; then

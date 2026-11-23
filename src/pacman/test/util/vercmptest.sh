@@ -21,7 +21,7 @@
 source "$(dirname "$0")"/../tap.sh || exit 1
 
 # default binary if one was not specified as $1
-bin=${1:-${PMTEST_UTIL_DIR}vercmp}
+bin=${1:-${PMTEST_UTIL_DIR}版本比较}
 
 # use first arg as our binary if specified
 if ! type -p "$bin" &>/dev/null; then

@@ -245,7 +245,7 @@ run_pacman() {
 		else
 			cmd=(su root -c "$cmdescape")
 		fi
-		local lockfile="$(rypm-conf DBPath)/db.lck"
+		local lockfile="$(包管理配置 DBPath)/db.lck"
 		while [[ -f $lockfile ]]; do
 			local timer=0
 			msg "$(gettext "Pacman is currently in use, please wait...")"
@@ -543,7 +543,7 @@ write_buildinfo() {
 	write_kv_pair "builddate" "${SOURCE_DATE_EPOCH}"
 	write_kv_pair "builddir"  "${BUILDDIR}"
 	write_kv_pair "startdir"  "${startdir}"
-	write_kv_pair "buildtool" "${BUILDTOOL:-makepkg}"
+	write_kv_pair "buildtool" "${BUILDTOOL:-构建包}"
 	write_kv_pair "buildtoolver" "${BUILDTOOLVER:-$makepkg_version}"
 	write_kv_pair "buildenv" "${BUILDENV[@]}"
 	write_kv_pair "options" "${OPTIONS[@]}"
@@ -869,7 +869,7 @@ run_split_packaging() {
 }
 
 usage() {
-	printf "makepkg (pacman) %s\n" "$makepkg_version"
+	printf "构建包 (日月) %s\n" "$makepkg_version"
 	echo
 	printf -- "$(gettext "Make packages compatible for use with pacman")\n"
 	echo
@@ -891,7 +891,7 @@ usage() {
 	printf -- "$(gettext "  -p <file>        Use an alternate build script (instead of '%s')")\n" "$BUILDSCRIPT"
 	printf -- "$(gettext "  -r, --rmdeps     Remove installed dependencies after a successful build")\n"
 	printf -- "$(gettext "  -R, --repackage  Repackage contents of the package without rebuilding")\n"
-	printf -- "$(gettext "  -s, --syncdeps   Install missing dependencies with %s")\n" "pacman"
+	printf -- "$(gettext "  -s, --syncdeps   Install missing dependencies with %s")\n" "包管理"
 	printf -- "$(gettext "  -S, --source     Generate a source-only tarball without downloaded sources")\n"
 	printf -- "$(gettext "  -V, --version    Show version information and exit")\n"
 	printf -- "$(gettext "  --allsource      Generate a source-only tarball including downloaded sources")\n"
@@ -911,19 +911,19 @@ usage() {
 	printf -- "$(gettext "  --skippgpcheck   Do not verify source files with PGP signatures")\n"
 	printf -- "$(gettext "  --verifysource   Download source files (if needed) and perform integrity checks")\n"
 	echo
-	printf -- "$(gettext "These options can be passed to %s:")\n" "pacman"
+	printf -- "$(gettext "These options can be passed to %s:")\n" "包管理"
 	echo
 	printf -- "$(gettext "  --asdeps         Install packages as non-explicitly installed")\n"
 	printf -- "$(gettext "  --needed         Do not reinstall the targets that are already up to date")\n"
 	printf -- "$(gettext "  --noconfirm      Do not ask for confirmation when resolving dependencies")\n"
 	printf -- "$(gettext "  --noprogressbar  Do not show a progress bar when downloading files")\n"
 	echo
-	printf -- "$(gettext "If %s is not specified, %s will look for '%s'")\n" "-p" "makepkg" "$BUILDSCRIPT"
+	printf -- "$(gettext "If %s is not specified, %s will look for '%s'")\n" "-p" "构建包" "$BUILDSCRIPT"
 	echo
 }
 
 version() {
-	printf "makepkg (pacman) %s\n" "$makepkg_version"
+	printf "构建包 (日月) %s\n" "$makepkg_version"
 	printf -- "Copyright (c) 2006-2024 Pacman Development Team <pacman-dev@lists.archlinux.org>.\n"
 	printf -- "Copyright (C) 2002-2006 Judd Vinet <jvinet@zeroflux.org>.\n"
 	printf '\n'
@@ -1056,7 +1056,7 @@ unset var
 PACKAGER=${PACKAGER:-"Unknown Packager"}
 
 # set pacman command if not already defined
-PACMAN=${PACMAN:-rypm}
+PACMAN=${PACMAN:-包管理}
 # save full path to command as PATH may change when sourcing /etc/profile
 PACMAN_PATH=$(type -P $PACMAN)
 
@@ -1107,12 +1107,12 @@ fi
 if (( ! INFAKEROOT )); then
 	if (( EUID == 0 )); then
 		error "$(gettext "Running %s as root is not allowed as it can cause permanent,\n\
-catastrophic damage to your system.")" "makepkg"
+catastrophic damage to your system.")" "构建包"
 		exit $E_ROOT
 	fi
 else
 	if [[ -z $FAKEROOTKEY ]]; then
-		error "$(gettext "Do not use the %s option. This option is only for internal use by %s.")" "'-F'" "makepkg"
+		error "$(gettext "Do not use the %s option. This option is only for internal use by %s.")" "'-F'" "构建包"
 		exit $E_INVALID_OPTION
 	fi
 fi

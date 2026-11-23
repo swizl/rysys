@@ -857,7 +857,7 @@ static int setup_libalpm(void)
 		pm_printf(ALPM_LOG_ERROR, _("failed to initialize alpm library:\n(root: %s, dbpath: %s)\n%s\n"),
 		        config->rootdir, config->dbpath, alpm_strerror(err));
 		if(err == ALPM_ERR_DB_VERSION) {
-			fprintf(stderr, _("try running rypm-db-upgrade\n"));
+			fprintf(stderr, _("try running 数据库升级\n"));
 		}
 		return -1;
 	}

@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-#   repo-add - add a package to a given repo database file
-#   repo-remove - remove a package entry from a given repo database file
+#   仓库添加 - add a package to a given repo database file
+#   仓库删除 - remove a package entry from a given repo database file
 #
 #   Copyright (c) 2006-2024 Pacman Development Team <pacman-dev@lists.archlinux.org>
 #
@@ -56,23 +56,23 @@ umask 0022
 # print usage instructions
 usage() {
 	cmd=${0##*/}
-	printf -- "%s (pacman) %s\n\n" "$cmd" "$myver"
-	if [[ $cmd == "repo-add" ]] ; then
-		printf -- "$(gettext "Usage: repo-add [options] <path-to-db> <package> ...\n")"
+	printf -- "%s (日月) %s\n\n" "$cmd" "$myver"
+	if [[ $cmd == "仓库添加" ]] ; then
+		printf -- "$(gettext "Usage: 仓库添加 [options] <path-to-db> <package> ...\n")"
 		printf -- "\n"
 		printf -- "$(gettext "\
-repo-add will update a package database by reading a package file.\n\
+仓库添加 will update a package database by reading a package file.\n\
 Multiple packages to add can be specified on the command line.\n")"
 		printf -- "\n"
 		printf -- "$(gettext "Options:\n")"
 		printf -- "$(gettext "  -n, --new         only add packages that are not already in the database\n")"
 		printf -- "$(gettext "  -R, --remove      remove old package file from disk after updating database\n")"
 		printf -- "$(gettext "  -p, --prevent-downgrade  do not add package to database if a newer version is already present\n")"
-	elif [[ $cmd == "repo-remove" ]] ; then
-		printf -- "$(gettext "Usage: repo-remove [options] <path-to-db> <packagename> ...\n")"
+	elif [[ $cmd == "仓库删除" ]] ; then
+		printf -- "$(gettext "Usage: 仓库删除 [options] <path-to-db> <packagename> ...\n")"
 		printf -- "\n"
 		printf -- "$(gettext "\
-repo-remove will update a package database by removing the package name\n\
+仓库删除 will update a package database by removing the package name\n\
 specified on the command line from the given repo database. Multiple\n\
 packages to remove can be specified on the command line.\n")"
 		printf -- "\n"
@@ -89,16 +89,16 @@ packages to remove can be specified on the command line.\n")"
 	printf -- "$(gettext "\n\
 See %s(8) for more details and descriptions of the available options.\n")" $cmd
 	printf "\n"
-	if [[ $cmd == "repo-add" ]] ; then
-		printf -- "$(gettext "Example:  repo-add /path/to/repo.db.tar.gz pacman-3.0.0-1-i686.pkg.tar.gz\n")"
-	elif [[ $cmd == "repo-remove" ]] ; then
-		printf -- "$(gettext "Example:  repo-remove /path/to/repo.db.tar.gz kernel26\n")"
+	if [[ $cmd == "仓库添加" ]] ; then
+		printf -- "$(gettext "Example:  仓库添加 /path/to/repo.db.tar.gz pacman-3.0.0-1-i686.pkg.tar.gz\n")"
+	elif [[ $cmd == "仓库删除" ]] ; then
+		printf -- "$(gettext "Example:  仓库删除 /path/to/repo.db.tar.gz kernel26\n")"
 	fi
 }
 
 version() {
 	cmd=${0##*/}
-	printf "%s (pacman) %s\n\n" "$cmd" "$myver"
+	printf "%s (日月) %s\n\n" "$cmd" "$myver"
 	printf -- "Copyright (c) 2006-2024 Pacman Development Team <pacman-dev@lists.archlinux.org>.\n"
 	printf '\n'
 	printf -- "$(gettext "\
@@ -424,7 +424,7 @@ prepare_repo_db() {
 			bsdtar -xf "$dbfile" -C "$tmpdir/$repo"
 		else
 			case $cmd in
-				repo-remove)
+				仓库删除)
 					# only a missing "db" database is currently an error
 					# TODO: remove if statement
 					if [[ $repo == "db" ]]; then
@@ -432,7 +432,7 @@ prepare_repo_db() {
 						exit 1
 					fi
 					;;
-				repo-add)
+				仓库添加)
 					# check if the file can be created (write permission, directory existence, etc)
 					if ! touch "$dbfile"; then
 						error "$(gettext "Repository file '%s' could not be created.")" "$dbfile"
@@ -579,12 +579,12 @@ esac
 
 # figure out what program we are
 cmd=${0##*/}
-if [[ $cmd == "repo-elephant" ]]; then
+if [[ $cmd == "仓库大象" ]]; then
 	elephant
 	exit 0
 fi
 
-if [[ $cmd != "repo-add" && $cmd != "repo-remove" ]]; then
+if [[ $cmd != "仓库添加" && $cmd != "仓库删除" ]]; then
 	error "$(gettext "Invalid command name '%s' specified.")" "$cmd"
 	exit 1
 fi
@@ -694,8 +694,8 @@ prepare_repo_db
 fail=0
 for arg in "${args[@]:1}"; do
 	case $cmd in
-		repo-add) add "$arg" ;;
-		repo-remove) remove "$arg" ;;
+		仓库添加) add "$arg" ;;
+		仓库删除) remove "$arg" ;;
 	esac || fail=1
 done
 

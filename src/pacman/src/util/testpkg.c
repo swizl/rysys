@@ -52,9 +52,9 @@ int main(int argc, char *argv[])
 #endif
 
 	if(argc != 2) {
-		fprintf(stderr, "testpkg (pacman) v" PACKAGE_VERSION "\n\n");
+		fprintf(stderr, "包校验 (日月) v" PACKAGE_VERSION "\n\n");
 		fprintf(stderr,	_("Test a pacman package for validity.\n\n"));
-		fprintf(stderr,	_("Usage: testpkg <package file>\n"));
+		fprintf(stderr,	_("Usage: 包校验 <package file>\n"));
 		return 1;
 	}
 

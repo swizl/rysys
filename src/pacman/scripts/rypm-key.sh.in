@@ -53,7 +53,7 @@ VERIFY=0
 VERBOSE=0
 
 usage() {
-	printf "rypm-key (pacman) %s\n" ${myver}
+	printf "密钥管理 (日月) %s\n" ${myver}
 	echo
 	printf -- "$(gettext "Usage: %s [options] operation [targets]")\n" $(basename $0)
 	echo
@@ -81,9 +81,9 @@ usage() {
 	echo
 	printf -- "$(gettext "Options:")\n"
 	printf -- "$(gettext "  --config <file>           Use an alternate config file (instead of\n\
-                            '%s')")\n" "@sysconfdir@/pacman.conf"
+                            '%s')")\n" "@sysconfdir@/日月.conf"
 	printf -- "$(gettext "  --gpgdir <dir>            Set an alternate directory for GnuPG (instead\n\
-                            of '%s')")\n" "@sysconfdir@/pacman.d/gnupg"
+                            of '%s')")\n" "@sysconfdir@/日月.d/gnupg"
 	printf -- "$(gettext "  --populate-from <dir>     Set an alternate directory for --populate (instead\n\
                             of '%s')")\n" "@keyringdir@"
 	printf -- "$(gettext "  --keyserver <server-url>  Specify a keyserver to use if necessary")\n"
@@ -93,7 +93,7 @@ usage() {
 }
 
 version() {
-	printf "rypm-key (pacman) %s\n" "${myver}"
+	printf "密钥管理 (日月) %s\n" "${myver}"
 	printf -- "Copyright (c) 2010-2024 Pacman Development Team <pacman-dev@lists.archlinux.org>.\n"
 	printf '\n'
 	printf -- "$(gettext "\
@@ -261,15 +261,15 @@ initialize() {
 check_keyring() {
 	if [[ ! -r ${PACMAN_KEYRING_DIR}/pubring.gpg || \
 			! -r ${PACMAN_KEYRING_DIR}/trustdb.gpg ]]; then
-		error "$(gettext "You do not have sufficient permissions to read the %s keyring.")" "pacman"
-		msg "$(gettext "Use '%s' to correct the keyring permissions.")" "rypm-key --init"
+		error "$(gettext "You do not have sufficient permissions to read the %s keyring.")" "日月"
+		msg "$(gettext "Use '%s' to correct the keyring permissions.")" "密钥管理 --init"
 		exit 1
 	fi
 
 	if (( (EXPORT || FINGER || LIST || VERIFY) && EUID != 0 )); then
 		if ! grep -q "^[[:space:]]*lock-never[[:space:]]*$" ${PACMAN_KEYRING_DIR}/gpg.conf &>/dev/null; then
 			error "$(gettext "You do not have sufficient permissions to run this command.")"
-			msg "$(gettext "Use '%s' to correct the keyring permissions.")" "rypm-key --init"
+			msg "$(gettext "Use '%s' to correct the keyring permissions.")" "密钥管理 --init"
 			exit 1
 		fi
 	fi
@@ -277,7 +277,7 @@ check_keyring() {
 	if (( LSIGNKEY || POPULATE )); then
 		if [[ $(secret_keys_available) -lt 1 ]]; then
 			error "$(gettext "There is no secret key available to sign with.")"
-			msg "$(gettext "Use '%s' to generate a default secret key.")" "rypm-key --init"
+			msg "$(gettext "Use '%s' to generate a default secret key.")" "密钥管理 --init"
 			exit 1
 		fi
 	fi
@@ -690,18 +690,18 @@ else
 fi
 
 if ! type -p gpg >/dev/null; then
-	error "$(gettext "Cannot find the %s binary required for all %s operations.")" "gpg" "rypm-key"
+	error "$(gettext "Cannot find the %s binary required for all %s operations.")" "gpg" "密钥管理"
 	exit 1
 fi
 
 if (( (ADD || DELETE || EDITKEY || IMPORT || IMPORT_TRUSTDB || INIT || LSIGNKEY || POPULATE || RECEIVE || REFRESH || UPDATEDB) && EUID != 0 )); then
-	error "$(gettext "%s needs to be run as root for this operation.")" "rypm-key"
+	error "$(gettext "%s needs to be run as root for this operation.")" "密钥管理"
 	exit 1
 fi
 
-CONFIG=${CONFIG:-@sysconfdir@/pacman.conf}
+CONFIG=${CONFIG:-@sysconfdir@/日月.conf}
 if [[ ! -r "${CONFIG}" ]]; then
-	error "$(gettext "%s configuration file '%s' not found.")" "pacman" "$CONFIG"
+	error "$(gettext "%s configuration file '%s' not found.")" "日月" "$CONFIG"
 	exit 1
 fi
 
@@ -709,7 +709,7 @@ KEYRING_IMPORT_DIR=${KEYRING_IMPORT_DIR:-"@keyringdir@"}
 
 # if PACMAN_KEYRING_DIR isn't assigned, try to get it from the config
 # file, falling back on a hard default
-PACMAN_KEYRING_DIR=${PACMAN_KEYRING_DIR:-$(rypm-conf --config="$CONFIG" gpgdir)}
+PACMAN_KEYRING_DIR=${PACMAN_KEYRING_DIR:-$(包管理配置 --config="$CONFIG" gpgdir)}
 
 GPG_PACMAN=(gpg --homedir "${PACMAN_KEYRING_DIR}" --no-permission-warning)
 if [[ -n ${KEYSERVER} ]]; then
@@ -730,7 +730,7 @@ case $numopt in
 		;;
 	[!1])
 		error "$(gettext "Multiple operations specified.")"
-		msg "$(gettext "Please run %s with each operation separately.")" "rypm-key"
+		msg "$(gettext "Please run %s with each operation separately.")" "密钥管理"
 		exit 1
 		;;
 esac

@@ -9,7 +9,7 @@ fpkg.backup = ["mnt/foo"]
 self.addpkg2db("local", fpkg)
 self.dbver = 8
 
-self.cmd = ["rypm-db-upgrade",
+self.cmd = ["数据库升级",
         "--root", self.rootdir(),
         "--dbpath", self.dbdir(),
         "--config", self.configfile() ]

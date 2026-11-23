@@ -1,11 +1,11 @@
-#compdef rypm rypm.static=rypm rypm-conf rypm-key makepkg
+#compdef 包管理 包管理配置 密钥管理 构建包 包模板 仓库添加 仓库删除 版本比较 包校验
 
 # copy this file to /usr/share/zsh/site-functions/_pacman
 
 typeset -A opt_args
 setopt extendedglob
 
-# options for passing to _arguments: main rypm commands
+# options for passing to _arguments: main 包管理 commands
 _pacman_opts_commands=(
 	{-D,--database}'[Modify database]'
 	{-F,--files}'[Query the files database]'
@@ -30,7 +30,7 @@ _pacman_opts_common=(
 	'--config[An alternate configuration file]:config file:_files'
 	'--confirm[Always ask for confirmation]'
 	'--debug[Display debug messages]'
-	'--gpgdir[Set an alternate directory for GnuPG (instead of @sysconfdir@/rypm.d/gnupg)]: :_files -/'
+	'--gpgdir[Set an alternate directory for GnuPG (instead of @sysconfdir@/日月.d/gnupg)]: :_files -/'
 	'--hookdir[Set an alternate hook location]: :_files -/'
 	'--logfile[An alternate log file]:config file:_files'
 	'--noconfirm[Do not ask for confirmation]'
@@ -312,7 +312,7 @@ _pacman_completions_all_packages() {
 		typeset -U packages
 		${seq} _wanted packages expl "packages" compadd ${sep[@]} - "${(@)packages}"
 
-		repositories=($(rypm-conf --repo-list))
+		repositories=($(包管理配置 --repo-list))
 		typeset -U repositories
 		_wanted repo_packages expl "repository/package" compadd -S "/" $repositories
 	fi
@@ -330,8 +330,8 @@ _pacman_completions_installed_groups() {
 # provides completions for installed packages
 _pacman_completions_installed_packages() {
 	local -a cmd packages packages_long
-	packages_long=(@localstatedir@/lib/rypm/local/*(/))
-	packages=( ${${packages_long#@localstatedir@/lib/rypm/local/}%-*-*} )
+	packages_long=(@localstatedir@/lib/日月/local/*(/))
+	packages=( ${${packages_long#@localstatedir@/lib/日月/local/}%-*-*} )
 	compadd "$@" -a packages
 }
 
@@ -344,18 +344,18 @@ _pacman_all_packages() {
 # provides completions for repository names
 _pacman_completions_repositories() {
 	local -a cmd repositories
-	repositories=($(rypm-conf --repo-list))
+	repositories=($(包管理配置 --repo-list))
 	# Uniq the array
 	typeset -U repositories
 	compadd "$@" -a repositories
 }
 
-# builds command for invoking rypm in a _call_program command - extracts
+# builds command for invoking 包管理 in a _call_program command - extracts
 # relevant options already specified (config file, etc)
 # $cmd must be declared by calling function
 _pacman_get_command() {
 	# this is mostly nicked from _perforce
-	cmd=( "rypm" "2>/dev/null")
+	cmd=( "包管理" "2>/dev/null")
 	integer i
 	for (( i = 2; i < CURRENT - 1; i++ )); do
 		if [[ ${words[i]} = "--config" || ${words[i]} = "--root" ]]; then
@@ -531,7 +531,7 @@ _pacman_conf_repo_directives=(
 _pacman_conf_completions_repositories() {
 	local -a repositories
 	# If the user specified an alternate config, use those repos
-	repositories=($(rypm-conf ${(kv)opt_args[(I)-c|--config]} --repo-list ))
+	repositories=($(包管理配置 ${(kv)opt_args[(I)-c|--config]} --repo-list ))
 	typeset -U repositories
 	compadd "$@" -a repositories
 }
@@ -572,7 +572,7 @@ _pacman_conf() {
 		"$_pacman_conf_commands[@]" \
 		"$_pacman_conf_options_common[@]" \
 		"$_pacman_conf_options[@]" \
-		'*:rypm directive:_pacman_conf_directive'
+		'*:包管理 directive:_pacman_conf_directive'
 
 	case $state in
 		repo_list)
@@ -594,7 +594,7 @@ _pacman_key_shortopts=(
 	'-f[List fingerprint for specified or all keyids]:*: :_pacman_key_list'
 	'-l[List the specified or all keys]:*: :_pacman_key_list'
 	'-r[Fetch the specified keyids]:*: :_pacman_key_list'
-	'-u[Update the trustdb of rypm]'
+	'-u[Update the trustdb of 包管理]'
 	'-v[Verify the file specified by the signature]: :_files -g "*.sig"'
 	'-V[Show program version]'
 )
@@ -607,7 +607,7 @@ _pacman_key_longopts=(
 	'--finger[List fingerprint for specified or all keyids]:*: :_pacman_key_list'
 	'--list-keys[List the specified or all keys]:*: :_pacman_key_list'
 	'--recv-keys[Fetch the specified keyids]:*: :_pacman_key_list'
-	'--updatedb[Update the trustdb of rypm]'
+	'--updatedb[Update the trustdb of 包管理]'
 	'--verify[Verify the file specified by the signature]: :_files -g "*.sig"'
 	'--version[Show program version]'
 	'--edit-key[Present a menu for key management task on keyids]:*: :_pacman_key_list'
@@ -621,8 +621,8 @@ _pacman_key_longopts=(
 )
 
 _pacman_key_options=(
-	'--config[Use an alternate config file (instead of @sysconfdir@/rypm.conf)]: :_files'
-	'--gpgdir[Set an alternate directory for GnuPG (instead of @sysconfdir@/rypm.d/gnupg)]: :_files -/'
+	'--config[Use an alternate config file (instead of @sysconfdir@/日月.conf)]: :_files'
+	'--gpgdir[Set an alternate directory for GnuPG (instead of @sysconfdir@/日月.d/gnupg)]: :_files -/'
 	'--keyserver[Specify a keyserver to use if necessary]'
 )
 
@@ -641,7 +641,7 @@ _pacman_key() {
 			;;
 		*)
 			i=$#
-			while [[ $words[$i] != -* ]] && [[ $words[$i] != "rypm-key" ]];do
+			while [[ $words[$i] != -* ]] && [[ $words[$i] != "密钥管理" ]];do
 				i=$(($i-1))
 			done
 			case $i in
@@ -666,7 +666,7 @@ _pacman_key() {
 
 _pacman_key_list() {
 	local keylist keys
-	keylist=$(rypm-key --list-keys 2>/dev/null | awk '
+	keylist=$(密钥管理 --list-keys 2>/dev/null | awk '
 		$1 == "pub" {
 			# key id
 			split($2, a, "/"); print a[2]
@@ -686,7 +686,7 @@ _pacman_key_list() {
 }
 
 _makepkg_shortopts=(
-	'-s[Install missing dependencies with rypm]'
+	'-s[Install missing dependencies with 包管理]'
 	'-i[Install package after successful build]'
 	'-A[Ignore incomplete arch field in PKGBUILD]'
 	'-c[Clean up work files after build]'
@@ -726,7 +726,7 @@ _makepkg_longopts=(
 	'--nobuild[Download and extract files only]'
 	'--rmdeps[Remove installed dependencies after a successful build]'
 	'--repackage[Repackage contents of the package without rebuilding]'
-	'--syncdeps[Install missing dependencies with rypm]'
+	'--syncdeps[Install missing dependencies with 包管理]'
 	'--source[Generate a source-only tarball without downloading sources]'
 	'--version[Show version information and exit]'
 	'--allsource[Generate a source-only tarball including downloaded source]'
@@ -766,7 +766,7 @@ _makepkg(){
 			;;
 		*)
 			i=$#
-			while [[ $words[i] != -* ]] && [[ $words[$i] != "makepkg" ]];do
+			while [[ $words[i] != -* ]] && [[ $words[$i] != "构建包" ]];do
 				i=$((i-1))
 			done
 			case $words[$i] in
@@ -791,16 +791,16 @@ _makepkg(){
 }
 _pacman_comp() {
 	case "$service" in
-		makepkg)
+		构建包)
 			_makepkg "$@"
 			;;
-		rypm-conf)
+		包管理配置)
 			_pacman_conf "$@"
 			;;
-		rypm-key)
+		密钥管理)
 			_pacman_key "$@"
 			;;
-		rypm)
+		包管理)
 			_pacman_zsh_comp "$@"
 			;;
 		*)

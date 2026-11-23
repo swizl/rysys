@@ -1,12 +1,12 @@
 wrapped_scripts = [
-  'makepkg.sh.in',
-  'rypm-db-upgrade.sh.in',
-  'rypm-key.sh.in',
-  'repo-add.sh.in'
+  ['makepkg.sh.in', '构建包'],
+  ['rypm-db-upgrade.sh.in', '数据库升级'],
+  ['rypm-key.sh.in', '密钥管理'],
+  ['repo-add.sh.in', '仓库添加'],
 ]
 
 scripts = [
-  'makepkg-template.pl.in',
+  ['makepkg-template.pl.in', '包模板'],
 ]
 
 SCRIPT_EDITOR = find_program(configure_file(
@@ -14,46 +14,42 @@ SCRIPT_EDITOR = find_program(configure_file(
   output : 'edit-script.sh',
   configuration : substs))
 
-foreach script : scripts
-  script_shortname = script.split('.')[0]
-
+foreach item : scripts
   custom_target(
-    script,
-    input : script,
+    item[0],
+    input : item[0],
     command : [ SCRIPT_EDITOR, '@INPUT@', '@OUTPUT@', '0755'],
-    output : script_shortname,
+    output : item[1],
     install : true,
     install_dir : get_option('bindir'))
 endforeach
 
 script_wrappers = []
-foreach script : wrapped_scripts
-  script_shortname = script.split('.')[0]
-
+foreach item : wrapped_scripts
   internal_script = custom_target(
-    script,
-    input : script,
+    item[0],
+    input : item[0],
     command : [ SCRIPT_EDITOR, '@INPUT@', '@OUTPUT@', '0755'],
-    output : script_shortname,
+    output : item[1],
     install : true,
     install_dir : BINDIR)
 
-  script_wrappers += [[ script_shortname, internal_script, meson.current_build_dir() ]]
+  script_wrappers += [[ item[1], internal_script, meson.current_build_dir() ]]
 
-  if script_shortname == 'repo-add'
+  if item[0] == 'repo-add.sh.in'
     repo_add = internal_script
   endif
 endforeach
 
-foreach symlink : ['repo-remove', 'repo-elephant']
+foreach symlink : ['仓库删除', '仓库大象']
   meson.add_install_script(MESON_MAKE_SYMLINK,
-                           'repo-add',
+                           '仓库添加',
                            join_paths(BINDIR, symlink))
 
   internal_script = custom_target(
     symlink,
     build_by_default : true,
-    command : ['ln', '-sf', 'repo-add', '@OUTPUT@'],
+    command : ['ln', '-sf', '仓库添加', '@OUTPUT@'],
     depends : repo_add,
     output : symlink)
 
@@ -72,13 +68,13 @@ custom_target(
   'bash_completion',
   command : [ SCRIPT_EDITOR, '@INPUT@', '@OUTPUT@' ],
   input : 'completion/bash_completion.in',
-  output : 'pacman',
+  output : '包管理',
   install : true,
   install_dir : BASHCOMPDIR)
 
-foreach symlink : ['rypm-key', 'makepkg']
+foreach symlink : ['包管理配置', '密钥管理', '构建包', '包模板', '仓库添加', '仓库删除', '版本比较', '包校验', '数据库升级']
   meson.add_install_script(MESON_MAKE_SYMLINK,
-                           'pacman',
+                           '包管理',
                            join_paths(BASHCOMPDIR, symlink))
 endforeach
 
@@ -87,6 +83,6 @@ custom_target(
   'zsh_completion',
   command : [ SCRIPT_EDITOR, '@INPUT@', '@OUTPUT@' ],
   input : 'completion/zsh_completion.in',
-  output : '_pacman',
+  output : '_包管理',
   install : true,
   install_dir : zsh_completion_dir)

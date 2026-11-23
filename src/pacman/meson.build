@@ -364,7 +364,7 @@ pkgconfig.generate(
 )
 
 pacman_bin = executable(
-  'rypm',
+  '包管理',
   pacman_sources,
   include_directories : includes,
   link_with : [libalpm, libcommon],
@@ -373,7 +373,7 @@ pacman_bin = executable(
 )
 
 executable(
-  'rypm-conf',
+  '包管理配置',
   pacman_conf_sources,
   include_directories : includes,
   link_with : [libalpm, libcommon],
@@ -382,7 +382,7 @@ executable(
 )
 
 executable(
-  'testpkg',
+  '包校验',
   testpkg_sources,
   include_directories : includes,
   link_with : [libalpm],
@@ -391,7 +391,7 @@ executable(
 )
 
 executable(
-  'vercmp',
+  '版本比较',
   vercmp_sources,
   include_directories : includes,
   link_with : [libalpm_a],
@@ -453,7 +453,6 @@ foreach path : [
 	meson.add_install_script('sh', '-c', 'mkdir -p "$DESTDIR/@0@"'.format(path))
 endforeach
 
-meson.add_install_script(MESON_MAKE_SYMLINK, 'rypm', join_paths(BINDIR, 'pacman'))
 
 TEST_ENV = environment()
 TEST_ENV.set('PMTEST_SCRIPTLIB_DIR', join_paths(meson.project_source_root(), 'scripts/library/'))

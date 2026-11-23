@@ -240,7 +240,7 @@ static void usage(int op, const char * const myname)
 static void version(void)
 {
 	printf("\n");
-	printf(" .--.                  rypm v%s - libalpm v%s\n", PACKAGE_VERSION, alpm_version());
+	printf(" .--.                  包管理 v%s - libalpm v%s\n", PACKAGE_VERSION, alpm_version());
 	printf("/ _.-' .-.  .-.  .-.   Copyright (C) 2006-2024 Pacman Development Team\n");
 	printf("\\  '-. '-'  '-'  '-'   Copyright (C) 2002-2006 Judd Vinet\n");
 	printf(" '--'\n");
@@ -274,7 +274,7 @@ static void setuseragent(void)
 	int len;
 
 	uname(&un);
-	len = snprintf(agent, 100, "rypm/%s (%s %s) libalpm/%s",
+	len = snprintf(agent, 100, "riyue/%s (%s %s) libalpm/%s",
 			PACKAGE_VERSION, un.sysname, un.machine, alpm_version());
 	if(len >= 100) {
 		pm_printf(ALPM_LOG_WARNING, _("HTTP_USER_AGENT truncated\n"));

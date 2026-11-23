@@ -22,7 +22,7 @@
 #include "conf.h"
 #include "util.h"
 
-const char *myname = "rypm-conf", *myver = "1.0.0";
+const char *myname = "包管理配置", *myver = "1.0.0";
 
 alpm_list_t *directives = NULL;
 char sep = '\n', *repo_name = NULL;
@@ -38,9 +38,9 @@ static void cleanup(void)
 static void usage(int ret)
 {
 	FILE *stream = (ret ? stderr : stdout);
-	fputs(_("rypm-conf - query pacman's configuration file\n"), stream);
-	fputs(_("usage:  rypm-conf [options] [<directive>...]\n"), stream);
-	fputs(_("        rypm-conf (--repo-list|--help|--version)\n"), stream);
+	fputs(_("包管理配置 - 查询日月配置文件\n"), stream);
+	fputs(_("usage:  包管理配置 [options] [<directive>...]\n"), stream);
+	fputs(_("        包管理配置 (--repo-list|--help|--version)\n"), stream);
 	fputs(_("options:\n"), stream);
 	fputs(_("  -c, --config=<path>  set an alternate configuration file\n"), stream);
 	fputs(_("  -R, --rootdir=<path> set an alternate installation root\n"), stream);

@@ -29,9 +29,9 @@ int alpm_pkg_vercmp(const char *a, const char *b);
 
 static void usage(void)
 {
-	fprintf(stderr, "vercmp (pacman) v" PACKAGE_VERSION "\n\n"
+	fprintf(stderr, "版本比较 (日月) v" PACKAGE_VERSION "\n\n"
 		"Compare package version numbers using pacman's version comparison logic.\n\n"
-		"Usage: vercmp <ver1> <ver2>\n\n"
+		"Usage: 版本比较 <ver1> <ver2>\n\n"
 		"Output values:\n"
 		"  < 0 : if ver1 < ver2\n"
 		"    0 : if ver1 == ver2\n"
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 	}
 	if(argc != 3) {
 		fprintf(stderr, "error: %d argument(s) specified\n\n"
-			"Usage: vercmp <ver1> <ver2>\n", argc - 1);
+			"Usage: 版本比较 <ver1> <ver2>\n", argc - 1);
 		return EXIT_FAILURE;
 	}
 
