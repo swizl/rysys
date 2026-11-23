@@ -1,4 +1,4 @@
-build/
+构建/
 .git_upstream/
 *.o
 *.obj

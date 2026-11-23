@@ -2,7 +2,7 @@
 # using the MSYS2 installation as sysroot.
 #
 # Usage:
-#   cmake -G Ninja -S winsup/cygwin -B build/cmake-clang \
+#   cmake -G Ninja -S winsup/cygwin -B 构建/cmake-clang \
 #         -DCMAKE_TOOLCHAIN_FILE=winsup/cygwin/cmake/toolchain-clang-cygwin.cmake
 
 if(NOT DEFINED MSYS2_ROOT)

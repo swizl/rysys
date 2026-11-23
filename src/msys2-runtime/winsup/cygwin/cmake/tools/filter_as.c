@@ -12,129 +12,134 @@
  * fill byte is dropped (alignment/padding stay identical).
  *
  * Invoked by clang as the program named "as" (see -B <this dir>).
+ *
+ * 本版本全部使用宽字符 API：构建目录含中文（如 D:\src\rysys\构建）时，
+ * ANSI 版的 fopen/_spawnv 会把路径按当前代码页拆坏，宽字符版不会。
+ * 编译时需要 -municode 以使用 wmain 入口。
  */
+#define _UNICODE
+#define UNICODE
+#define __USE_MINGW_ANSI_STDIO 1
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
 #include <process.h>
 #include <windows.h>
 
-#define REAL_AS "C:\\tools\\msys64\\usr\\bin\\as.exe"
+#define REAL_AS L"C:\\tools\\msys64\\usr\\bin\\as.exe"
 
 static int
-is_skip (const char *line)
+is_skip (const wchar_t *line)
 {
-  const char *p = line;
-  while (*p == ' ' || *p == '\t')
+  const wchar_t *p = line;
+  while (*p == L' ' || *p == L'\t')
     p++;
-  if (!strncmp (p, ".seh_startepilogue", 18))
+  if (!wcsncmp (p, L".seh_startepilogue", 18))
     return 1;
-  if (!strncmp (p, ".seh_endepilogue", 16))
+  if (!wcsncmp (p, L".seh_endepilogue", 16))
     return 1;
   return 0;
 }
 
 static void
-write_line (FILE *g, const char *line)
+write_line (FILE *g, const wchar_t *line)
 {
-  const char *p = line;
-  while (*p == ' ' || *p == '\t')
+  const wchar_t *p = line;
+  while (*p == L' ' || *p == L'\t')
     p++;
-  if (!strncmp (p, ".section", 8))
+  if (!wcsncmp (p, L".section", 8))
     {
       /* LLVM COFF: .section .text$sym,"xr",discard,sym
 	 GNU gas:   .section .text$sym,"xr"  +  .linkonce discard  */
-      const char *d = strstr (p, ",discard");
+      const wchar_t *d = wcsstr (p, L",discard");
       if (d)
 	{
-	  fwrite (line, 1, d - line, g);
-	  fputc ('\n', g);
-	  fputs ("\t.linkonce\tdiscard\n", g);
+	  fwprintf (g, L"%.*ls\n", (int) (d - line), line);
+	  fputws (L"\t.linkonce\tdiscard\n", g);
 	  return;
 	}
       /* ".ctors,"dw",unique,0": gas has no "unique" selector; plain
 	 .ctors merging is done by the linker.  */
-      const char *u = strstr (p, ",unique");
+      const wchar_t *u = wcsstr (p, L",unique");
       if (u)
 	{
-	  fwrite (line, 1, u - line, g);
-	  fputc ('\n', g);
+	  fwprintf (g, L"%.*ls\n", (int) (u - line), line);
 	  return;
 	}
     }
-  if (!strncmp (p, ".p2align", 8))
+  if (!wcsncmp (p, L".p2align", 8))
     {
-      const char *comma = strchr (p, ',');
-      if (comma && strstr (comma, "0x0"))
+      const wchar_t *comma = wcschr (p, L',');
+      if (comma && wcsstr (comma, L"0x0"))
 	{
-	  fwrite (line, 1, comma - line, g);
-	  fputc ('\n', g);
+	  fwprintf (g, L"%.*ls\n", (int) (comma - line), line);
 	  return;
 	}
     }
-  fputs (line, g);
+  fputws (line, g);
 }
 
 int
-main (int argc, char **argv)
+wmain (int argc, wchar_t **argv)
 {
-  const char *in = NULL;
+  const wchar_t *in = NULL;
   size_t inlen = 0;
   for (int i = 1; i < argc; i++)
-    if (argv[i][0] != '-'
-	&& (inlen = strlen (argv[i])) >= 2
-	&& !strcmp (argv[i] + inlen - 2, ".s"))
+    if (argv[i][0] != L'-'
+	&& (inlen = wcslen (argv[i])) >= 2
+	&& !wcscmp (argv[i] + inlen - 2, L".s"))
       in = argv[i];
   if (!in)
     {
-      fprintf (stderr, "filter_as: no input file\n");
+      fputs ("filter_as: no input file\n", stderr);
       return 1;
     }
 
-  const char *tmpdir = getenv ("TEMP");
-  if (!tmpdir)
-    tmpdir = "C:\\Windows\\Temp";
-  char tmp[MAX_PATH];
-  snprintf (tmp, sizeof (tmp), "%s\\filter_as_%lu.s", tmpdir,
+  wchar_t tmpdir[MAX_PATH];
+  if (GetTempPathW (MAX_PATH, tmpdir) == 0)
+    wcscpy (tmpdir, L"C:\\Windows\\Temp\\");
+  wchar_t tmp[MAX_PATH];
+  swprintf (tmp, MAX_PATH, L"%lsfilter_as_%lu.s", tmpdir,
 	    (unsigned long) GetCurrentProcessId ());
 
-  FILE *f = fopen (in, "r");
+  FILE *f = _wfopen (in, L"r");
   if (!f)
     {
-      perror ("filter_as: open input");
+      fwprintf (stderr, L"filter_as: cannot open input %ls\n", in);
       return 1;
     }
-  FILE *g = fopen (tmp, "w");
+  FILE *g = _wfopen (tmp, L"w");
   if (!g)
     {
-      perror ("filter_as: create temp");
+      fwprintf (stderr, L"filter_as: cannot create temp %ls\n", tmp);
       fclose (f);
       return 1;
     }
 
-  char *line = malloc (1 << 20);
+  wchar_t *line = (wchar_t *) malloc ((1 << 20) * sizeof (wchar_t));
   if (!line)
     return 1;
-  while (fgets (line, 1 << 20, f))
+  while (fgetws (line, 1 << 20, f))
     if (!is_skip (line))
       write_line (g, line);
   free (line);
   fclose (f);
   fclose (g);
 
-  char **nav = calloc (argc + 1, sizeof (char *));
+  wchar_t **nav = (wchar_t **) calloc (argc + 1, sizeof (wchar_t *));
   for (int i = 0; i < argc; i++)
     nav[i] = (argv[i] == in) ? tmp : argv[i];
 
-  intptr_t rc = _spawnv (_P_WAIT, REAL_AS, (const char *const *) nav);
+  intptr_t rc = _wspawnv (_P_WAIT, REAL_AS, (const wchar_t *const *) nav);
   if (rc == -1)
     {
-      perror ("filter_as: spawn as");
+      fputs ("filter_as: spawn as failed\n", stderr);
       return 1;
     }
   if (rc == 0)
-    DeleteFileA (tmp);
+    DeleteFileW (tmp);
   else
-    fprintf (stderr, "filter_as: kept filtered input at %s\n", tmp);
+    fwprintf (stderr, L"filter_as: kept filtered input at %ls\n", tmp);
   return (int) rc;
 }

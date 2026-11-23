@@ -207,15 +207,12 @@ int wmain(int argc, wchar_t* argv[]) {
 	}
 
 	wcscpy(confpath, exepath);
-	tmp = confpath + wcslen(confpath) - 4;
-	if (wcsicmp(L".exe", tmp) != 0) {
+	tmp = confpath + wcslen(confpath) - wcslen(LAUNCHER_EXE_SUFFIX);
+	if (wcsicmp(LAUNCHER_EXE_SUFFIX, tmp) != 0) {
 		ShowError(L"Could not find configuration file", confpath, 0);
 		return __LINE__;
 	}
-	*tmp++ = L'.';
-	*tmp++ = L'i';
-	*tmp++ = L'n';
-	*tmp++ = L'i';
+	wcscpy(tmp, LAUNCHER_CONF_SUFFIX);
 
 	if (argc > 1) {
 		code = SetEnvironmentVariable(L"CHERE_INVOKING", L"1");

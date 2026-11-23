@@ -12,6 +12,11 @@
 #include <windows.h>
 #include <wchar.h>
 
+/* 运行时 DLL 名由宏统一控制；未预定义时保持上游默认值。 */
+#ifndef MSYS_RUNTIME_DLL
+#define MSYS_RUNTIME_DLL "msys-2.0.dll"
+#endif
+
 /* Load all system libs from the windows system directory by prepending the
    full path.  This doesn't work for loadling msys-2.0.dll.  For this case,
    instead of prepending the path, make sure that the CWD is removed from
@@ -45,8 +50,9 @@ _load_sys_library (const wchar_t *dll)
       	set_dll_directory (L"");
     }
 
-  if (wcscmp (dll, L"msys-2.0.dll") == 0)
-    return LoadLibraryExW (L"msys-2.0.dll", NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+  if (wcscmp (dll, L"" MSYS_RUNTIME_DLL) == 0)
+    return LoadLibraryExW (L"" MSYS_RUNTIME_DLL, NULL,
+			   LOAD_WITH_ALTERED_SEARCH_PATH);
 
   wcscpy (dllpath, sysdir);
   wcscpy (dllpath + sysdir_len, dll);

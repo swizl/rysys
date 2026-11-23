@@ -380,7 +380,7 @@ hook_or_detect_cygwin (const char *name, const void *fn, WORD& subsys, HANDLE h)
     {
       if (!ascii_strcasematch (rva (PSTR, map ?: (char *) hm, pd->Name - delta),
 #ifdef __MSYS__
-			       "msys-2.0.dll"))
+			       MSYS_RUNTIME_DLL))
 #else
 			       "cygwin1.dll"))
 #endif
