@@ -1,0 +1,9 @@
+libmakepkg.pc
+makepkg
+makepkg-template
+rypm-db-upgrade
+rypm-key
+repo-add
+repo-elephant
+repo-remove
+*-wrapper
