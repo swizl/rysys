@@ -411,3 +411,120 @@ add_custom_command(OUTPUT "${GEN}/${MSYS_DLL_FILE}" "${GEN}/${MSYS_IMPLIB_FILE}"
   COMMENT "Linking ${MSYS_DLL_FILE}")
 
 add_custom_target(msysdll ALL DEPENDS "${GEN}/${MSYS_DLL_FILE}")
+
+# ---------------------------------------------------------------------------
+# winsup/utils 工具（链接到新建的运行时 DLL）
+# ---------------------------------------------------------------------------
+# 工具名保持上游英文名（cygpath/ps/mount/...），输出目录由中文名宏控制。
+option(CYGWIN_BUILD_UTILS "构建 winsup/utils 命令行工具" ON)
+if(CYGWIN_BUILD_UTILS)
+  set(UTILS_SRC "${RUNTIME_SRC}/winsup/utils")
+  if(CYGWIN_CHINESE_NAMES)
+    set(UTILS_DIR_FILE "工具")
+  else()
+    set(UTILS_DIR_FILE "utils")
+  endif()
+  set(UTILS_OUT "${GEN}/${UTILS_DIR_FILE}")
+  file(MAKE_DIRECTORY "${UTILS_OUT}")
+
+  # 对应 Makefile.am 的 AM_CPPFLAGS / CFLAGS_COMMON
+  set(UTILS_C_FLAGS
+      ${CYGWIN_TARGET_FLAGS}
+      ${CYGWIN_COMMON_FLAGS}
+      -D_WIN32_WINNT=0x0a00
+      -DNTDDI_VERSION=WDK_NTDDI_VERSION
+      -Wimplicit-fallthrough=4
+      -Wwrite-strings)
+  set(UTILS_CXX_FLAGS
+      ${UTILS_C_FLAGS}
+      -fno-rtti -fno-exceptions -fno-use-cxa-atexit)
+
+  set(UTILS_INC
+      "-I${CS}/local_includes"
+      "-I${GEN}"
+      "-I${UTILS_SRC}"
+      -isystem ${CS}/include
+      -isystem ${TARGET_BUILD_DIR}/newlib/targ-include
+      -isystem ${RUNTIME_SRC}/newlib/libc/include)
+
+  set(UTILS_LINK_DRIVER "${MSYS2_ROOT}/usr/bin/x86_64-pc-cygwin-g++.exe")
+  set(UTILS_LD_FLAGS -static -Wl,--enable-auto-import)
+
+  set(UTILS_OUTPUTS "")
+  function(cygwin_utils_tool name)
+    cmake_parse_arguments(T "" "" "SOURCES;CXXFLAGS;LIBS;LDFLAGS" ${ARGN})
+    file(MAKE_DIRECTORY "${UTILS_OUT}/obj/${name}")
+    set(_objs "")
+    foreach(src IN LISTS T_SOURCES)
+      get_filename_component(_base "${src}" NAME_WE)
+      get_filename_component(_ext "${src}" EXT)
+      set(_obj "${UTILS_OUT}/obj/${name}/${_base}.o")
+      if(_ext STREQUAL ".cc")
+        set(_cc "${CMAKE_CXX_COMPILER}")
+        set(_flags ${UTILS_CXX_FLAGS} ${T_CXXFLAGS})
+      else()
+        set(_cc "${CMAKE_C_COMPILER}")
+        set(_flags ${UTILS_C_FLAGS})
+      endif()
+      add_custom_command(OUTPUT "${_obj}"
+        COMMAND "${_cc}" ${_flags} ${UTILS_INC}
+                -c "${UTILS_SRC}/${src}" -o "${_obj}"
+        DEPENDS "${UTILS_SRC}/${src}" "${GEN}/config.h"
+        COMMAND_EXPAND_LISTS
+        COMMENT "编译 ${name}/${src}")
+      list(APPEND _objs "${_obj}")
+    endforeach()
+    if(T_LDFLAGS)
+      set(_ldflags ${T_LDFLAGS})
+    else()
+      set(_ldflags ${UTILS_LD_FLAGS})
+    endif()
+    add_custom_command(OUTPUT "${UTILS_OUT}/${name}.exe"
+      COMMAND "${UTILS_LINK_DRIVER}" ${_ldflags} -o "${UTILS_OUT}/${name}.exe"
+              ${_objs} "${GEN}/${MSYS_IMPLIB_FILE}" -lnetapi32 ${T_LIBS}
+      DEPENDS ${_objs} "${GEN}/${MSYS_IMPLIB_FILE}" "${GEN}/${MSYS_DLL_FILE}"
+      COMMENT "链接 ${name}.exe")
+    set(UTILS_OUTPUTS "${UTILS_OUTPUTS}" "${UTILS_OUT}/${name}.exe" PARENT_SCOPE)
+  endfunction()
+
+  cygwin_utils_tool(chattr        SOURCES chattr.c)
+  cygwin_utils_tool(cygpath       SOURCES cygpath.cc
+                    CXXFLAGS -fno-threadsafe-statics
+                    LIBS -luserenv -lntdll)
+  cygwin_utils_tool(ps            SOURCES ps.cc       LIBS -lpsapi -lntdll)
+  cygwin_utils_tool(gencat        SOURCES gencat.c)
+  cygwin_utils_tool(getconf       SOURCES getconf.c)
+  cygwin_utils_tool(getfacl       SOURCES getfacl.c)
+  cygwin_utils_tool(gmondump      SOURCES gmondump.c)
+  cygwin_utils_tool(kill          SOURCES kill.cc)
+  cygwin_utils_tool(ldd           SOURCES ldd.cc      LIBS -lpsapi -lntdll)
+  cygwin_utils_tool(locale        SOURCES locale.cc)
+  cygwin_utils_tool(lsattr        SOURCES lsattr.c)
+  cygwin_utils_tool(minidumper    SOURCES minidumper.cc LIBS -ldbghelp)
+  cygwin_utils_tool(mkgroup       SOURCES mkgroup.c)
+  cygwin_utils_tool(mkpasswd      SOURCES mkpasswd.c)
+  cygwin_utils_tool(mount         SOURCES mount.cc path.cc CXXFLAGS -DFSTAB_ONLY)
+  cygwin_utils_tool(newgrp        SOURCES newgrp.c    LIBS -luserenv)
+  cygwin_utils_tool(passwd        SOURCES passwd.c)
+  cygwin_utils_tool(pldd          SOURCES pldd.c      LIBS -lpsapi)
+  cygwin_utils_tool(profiler      SOURCES profiler.cc path.cc LIBS -lntdll)
+  cygwin_utils_tool(regtool       SOURCES regtool.cc)
+  cygwin_utils_tool(setfacl       SOURCES setfacl.c)
+  cygwin_utils_tool(setmetamode   SOURCES setmetamode.c)
+  cygwin_utils_tool(ssp           SOURCES ssp.c)
+  cygwin_utils_tool(tzset         SOURCES tzset.c)
+  cygwin_utils_tool(umount        SOURCES umount.cc)
+
+  # dumper 仅在 libbfd.a 可用时构建（对应 Makefile.am 的 BUILD_DUMPER）
+  if(EXISTS "${MSYS2_ROOT}/usr/lib/libbfd.a")
+    cygwin_utils_tool(dumper SOURCES dumper.cc module_info.cc
+                      CXXFLAGS "-I${RUNTIME_SRC}/include"
+                      LIBS -lpsapi -lntdll -lbfd -lintl -liconv -liberty
+                           -lz -lsframe -lzstd
+                      LDFLAGS -Wl,--enable-auto-import)
+  else()
+    message(STATUS "libbfd.a 不可用，跳过 dumper")
+  endif()
+
+  add_custom_target(utils ALL DEPENDS ${UTILS_OUTPUTS})
+endif()
