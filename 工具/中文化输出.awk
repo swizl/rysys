@@ -161,5 +161,12 @@ BEGIN {
   sub(/^检查是否 to /, "检查是否要 ", line)
   sub(/^检查是否要 enable /, "检查是否启用 ", line)
 
+  # 并行构建时被拆到单独一行的检查结果
+  if (line == "yes") {
+    line = "是"
+  } else if (line == "no") {
+    line = "否"
+  }
+
   print line
 }
