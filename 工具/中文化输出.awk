@@ -74,7 +74,10 @@ BEGIN {
     sub(/No rule to make target /, "没有规则可生成目标 ", line)
     sub(/No targets specified and no makefile found/,
         "未指定目标且未找到 makefile", line)
-    sub(/ Error ([0-9]+)$/, " 错误 \\1", line)
+    if (match(line, /Error [0-9]+$/)) {
+      err = substr(line, RSTART + 6)
+      line = substr(line, 1, RSTART - 1) "错误 " err
+    }
     sub(/Stop\.$/, "停止。", line)
     print line
     next
