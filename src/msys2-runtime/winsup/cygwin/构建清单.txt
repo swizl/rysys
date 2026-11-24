@@ -415,7 +415,7 @@ add_custom_target(msysdll ALL DEPENDS "${GEN}/${MSYS_DLL_FILE}")
 # ---------------------------------------------------------------------------
 # winsup/utils 工具（链接到新建的运行时 DLL）
 # ---------------------------------------------------------------------------
-# 工具名保持上游英文名（cygpath/ps/mount/...），输出目录由中文名宏控制。
+# 工具名由 CYGWIN_CHINESE_NAMES 控制：ON 输出中文名，OFF 回退上游英文名。
 option(CYGWIN_BUILD_UTILS "构建 winsup/utils 命令行工具" ON)
 if(CYGWIN_BUILD_UTILS)
   set(UTILS_SRC "${RUNTIME_SRC}/winsup/utils")
@@ -426,6 +426,34 @@ if(CYGWIN_BUILD_UTILS)
   endif()
   set(UTILS_OUT "${GEN}/${UTILS_DIR_FILE}")
   file(MAKE_DIRECTORY "${UTILS_OUT}")
+
+  # 上游英文工具名 -> 中文产物名
+  set(UTILS_CN_NAME_chattr      改属性)
+  set(UTILS_CN_NAME_cygpath     路径转换)
+  set(UTILS_CN_NAME_dumper      进程转储)
+  set(UTILS_CN_NAME_gencat      生成消息)
+  set(UTILS_CN_NAME_getconf     取配置)
+  set(UTILS_CN_NAME_getfacl     取权限)
+  set(UTILS_CN_NAME_gmondump    剖析摘要)
+  set(UTILS_CN_NAME_kill        终止)
+  set(UTILS_CN_NAME_ldd         列依赖)
+  set(UTILS_CN_NAME_locale      区域设置)
+  set(UTILS_CN_NAME_lsattr      列属性)
+  set(UTILS_CN_NAME_minidumper  小转储)
+  set(UTILS_CN_NAME_mkgroup     建组)
+  set(UTILS_CN_NAME_mkpasswd    建口令)
+  set(UTILS_CN_NAME_mount       挂载)
+  set(UTILS_CN_NAME_newgrp      换组)
+  set(UTILS_CN_NAME_passwd      改口令)
+  set(UTILS_CN_NAME_pldd        列进程依赖)
+  set(UTILS_CN_NAME_profiler    性能剖析)
+  set(UTILS_CN_NAME_ps          进程列表)
+  set(UTILS_CN_NAME_regtool     注册表工具)
+  set(UTILS_CN_NAME_setfacl     设权限)
+  set(UTILS_CN_NAME_setmetamode 设元模式)
+  set(UTILS_CN_NAME_ssp         单步剖析)
+  set(UTILS_CN_NAME_tzset       设时区)
+  set(UTILS_CN_NAME_umount      卸载)
 
   # 对应 Makefile.am 的 AM_CPPFLAGS / CFLAGS_COMMON
   set(UTILS_C_FLAGS
@@ -453,6 +481,14 @@ if(CYGWIN_BUILD_UTILS)
   set(UTILS_OUTPUTS "")
   function(cygwin_utils_tool name)
     cmake_parse_arguments(T "" "" "SOURCES;CXXFLAGS;LIBS;LDFLAGS" ${ARGN})
+    if(CYGWIN_CHINESE_NAMES)
+      set(_outname "${UTILS_CN_NAME_${name}}")
+    else()
+      set(_outname "${name}")
+    endif()
+    if(NOT _outname)
+      message(FATAL_ERROR "缺少 ${name} 的中文产物名（UTILS_CN_NAME_${name}）")
+    endif()
     file(MAKE_DIRECTORY "${UTILS_OUT}/obj/${name}")
     set(_objs "")
     foreach(src IN LISTS T_SOURCES)
@@ -479,12 +515,12 @@ if(CYGWIN_BUILD_UTILS)
     else()
       set(_ldflags ${UTILS_LD_FLAGS})
     endif()
-    add_custom_command(OUTPUT "${UTILS_OUT}/${name}.exe"
-      COMMAND "${UTILS_LINK_DRIVER}" ${_ldflags} -o "${UTILS_OUT}/${name}.exe"
+    add_custom_command(OUTPUT "${UTILS_OUT}/${_outname}.exe"
+      COMMAND "${UTILS_LINK_DRIVER}" ${_ldflags} -o "${UTILS_OUT}/${_outname}.exe"
               ${_objs} "${GEN}/${MSYS_IMPLIB_FILE}" -lnetapi32 ${T_LIBS}
       DEPENDS ${_objs} "${GEN}/${MSYS_IMPLIB_FILE}" "${GEN}/${MSYS_DLL_FILE}"
-      COMMENT "链接 ${name}.exe")
-    set(UTILS_OUTPUTS "${UTILS_OUTPUTS}" "${UTILS_OUT}/${name}.exe" PARENT_SCOPE)
+      COMMENT "链接 ${_outname}.exe")
+    set(UTILS_OUTPUTS "${UTILS_OUTPUTS}" "${UTILS_OUT}/${_outname}.exe" PARENT_SCOPE)
   endfunction()
 
   cygwin_utils_tool(chattr        SOURCES chattr.c)
